@@ -1,21 +1,36 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 export async function connect() {
     try {
-        mongoose.connect(process.env.MONGO_URI!);
-        const connection = mongoose.connection;
-
-        connection.on("connected", () => {
-            console.log("MongoDB connected successfully");
-        });
-
-        connection.on("error", (err) => {
-            console.log("MongoDB connection error:", err);
-        });
-    } catch (error) {
-       console.log("something went  wrong!");
-       console.log(error);
+        console.log("I am here....n");
         
+        const uri = process.env.MONGO_URI;
+        if (!uri) {
+            throw new Error('Missing MONGO_URI environment variable');
+        }
+
+        // If already connected, return early
+        if (mongoose.connections[0].readyState) {
+            return;
+        }
+
+        // Connect with minimal options - the driver handles the rest
+        await mongoose.connect(uri);
+        
+        console.log('✓ MongoDB connected successfully');
+        
+        // Handle connection events
+        mongoose.connection.on('error', (error) => {
+            console.error('MongoDB connection error:', error);
+        });
+
+        return mongoose.connection;
+    } catch (error: any) {
+        console.error('Failed to connect to MongoDB:', {
+            error: error.message,
+            code: error.code,
+            name: error.name
+        });
+        throw error;
     }
-    
 }
