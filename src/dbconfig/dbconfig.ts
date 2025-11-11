@@ -2,6 +2,11 @@ import mongoose from 'mongoose';
 
 export async function connect() {
     try {
+        if (mongoose.connection.readyState >= 1) {
+      console.log("✅ MongoDB already connected");
+      return;
+        }
+
         console.log("I am here....n");
         
         const uri = process.env.MONGO_URI;
@@ -15,7 +20,9 @@ export async function connect() {
         }
 
         // Connect with minimal options - the driver handles the rest
-        await mongoose.connect(uri);
+        await mongoose.connect(uri,{
+         bufferCommands: false,
+        });
         
         console.log('✓ MongoDB connected successfully');
         

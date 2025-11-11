@@ -4,11 +4,15 @@ import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
 // Connect to MongoDB at the start of each request
-await connect();
+
 
 
 export async function POST(request:NextRequest){
     try { 
+        console.log("i am inside route..");
+        
+        await connect().then(()=>console.log("Connected to database"));
+
         const reqBody= await request.json();
         const {username,email,password}= reqBody;
            
